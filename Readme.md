@@ -6,15 +6,30 @@ Housekeeping is an open-source library meant to provide your PHP project with ba
 
 ## Installation
 
-Update your composer.json file to include this package as a dependency
+Update your `composer.json` file to include this package as a dependency
 
     "sjrdco/housekeeping": "dev-master"
 
-## Usage
+## Security usage
 
-You can encrypt **and** clean incoming data by calling the `cleanAndEncrypt` function.
+You can clean incoming data by calling the `cleanUp()` function.
 
-    $encrypted_input = Housekeeping\Security::cleanAndEncrypt($input);
+    $cleaned_input = Housekeeping\Security::cleanUp($input);
+
+You can encrypt it by first creating an encryption key and then using that to encrypt the data.
+ 
+    $encryption_key = Housekeeping\Security::generateKey();
+    $encrypted_input = Housekeeping\Security::encrypt($input, $encryption_key);
+
+You can also decrypt it by calling the `decrypt()` method together with that same encryption key.
+
+	$decrypted_input = Housekeeping\Security::decrypt($input, $encryption_key);
+
+## Logging usage
+
+You can log an action by calling the `logAction()` function. This function writes a log per entity. This means that it'll create a folder per day and this folder will contain logs for each entity.
+
+    Housekeeping\Logging::logAction($message, $entity);
 
 ## License
 
