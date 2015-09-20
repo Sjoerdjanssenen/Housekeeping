@@ -2,7 +2,7 @@
     "name": "sjrdco/housekeeping",
     "autoload": {
         "psr-0" : {
-            "Sjrdco\\Housekeeping" : "src"
+            "Sjrdco\\Housekeeping\\" : "src"
         }
     }
 }
