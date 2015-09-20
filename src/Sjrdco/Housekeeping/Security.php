@@ -32,12 +32,38 @@ class Security
 		
 		return $output;
 	}
+
+	/**
+     * Encodes a given string 
+     *
+     * @param string $input
+     * => The input that needs to be encoded.
+     *
+     * @return string $output
+     */
+	public function encode($input) {
+		return base64_encode($input);
+	}
+	
+	/**
+     * Decodes a given string 
+     *
+     * @param string $input
+     * => The input that needs to be decoded.
+     *
+     * @return string $output
+     */
+	public function decode($input) {
+		return base64_decode($input);
+	}
 	
 	/**
      * Encrypts a given string 
      *
      * @param string $input
      * => The input that needs to be encrypted.
+     * @param string $encryption_key
+     * => The key used to encrypt the input.
      *
      * @return string $output
      */
@@ -60,6 +86,8 @@ class Security
      *
      * @param string $input
      * => The input that needs to be decrypted.
+     * @param string $encryption_key
+     * => The key that was used to encrypt the string.
      *
      * @return string $output
      */
