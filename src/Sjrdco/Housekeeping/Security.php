@@ -1,7 +1,7 @@
 <?php
 namespace Sjrdco\Housekeeping;
 
-class SecurityHou
+class Security
 {
 	/**
      * Cleans and encrypts a given string 
@@ -17,7 +17,7 @@ class SecurityHou
 		
 		return $output;
 	}
-	
+
 	/**
      * Cleans a given string 
      *
@@ -27,6 +27,7 @@ class SecurityHou
      * @return string $output
      */
 	public function cleanUp($input) {
+		$input = trim($input);
 		$output = htmlspecialchars($input, ENT_QUOTES, 'UTF-8');;
 		
 		return $output;
