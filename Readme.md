@@ -1,3 +1,5 @@
+[![Packagist](https://img.shields.io/packagist/dm/sjrdco/housekeeping.svg)](https://packagist.org/packages/sjrdco/housekeeping)
+
 ## Housekeeping
 
 ![Housekeeping](http://sjrd.co/wp-content/uploads/2015/09/rondehoeken.png)
