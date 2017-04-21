@@ -19,14 +19,13 @@ You can clean incoming data by calling the `cleanUp()` function.
 
     $cleaned_input = Housekeeping\Security::cleanUp($input);
 
-You can encrypt it by first creating an encryption key and then using that to encrypt the data.
+You can encrypt input by calling the `encrypt()` method. This method returns an object containing the encrypted data, an initialization vector and the encryption key:
  
-    $encryption_key = Housekeeping\Security::generateKey();
-    $encrypted_input = Housekeeping\Security::encrypt($input, $encryption_key);
+    $enc = Housekeeping\Security::encrypt($input);
 
-You can also decrypt it by calling the `decrypt()` method together with that same encryption key.
+You can also decrypt a string by calling the `decrypt()` method when a key an iv are available.
 
-	$decrypted_input = Housekeeping\Security::decrypt($input, $encryption_key);
+	$decrypted_input = Housekeeping\Security::decrypt($enc->encrypt, $enc->key, $enc->iv);
 
 ## Logging usage
 
