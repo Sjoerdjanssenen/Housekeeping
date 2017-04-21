@@ -62,59 +62,106 @@ class Security
      *
      * @param string $input
      * => The input that needs to be encrypted.
-     * @param string $encryption_key
-     * => The key used to encrypt the input.
+     * @param string $base64
+     * => Is the text BINARYVAR/BINDARY/VARCHAR?, leave empty if not sure
      *
-     * @return string $output
+     * @return object $_enc
      */
-	public function encrypt($input, $encryption_key) {
-		$iv_size = 16; // 128 bits
-		$iv = openssl_random_pseudo_bytes($iv_size, $strong);
 
-		$name = 'Jack';
-		$enc_name = openssl_encrypt(
-		    pkcs7_pad($name, 16), // padded data
-		    'AES-256-CBC',        // cipher and mode
-		    $encryption_key,      // secret key
-		    0,                    // options (not used)
-		    $iv                   // initialisation vector
+	public static function encrypt($text, $base64 = false)
+	{
+		$_enc 			= new StdClass();
+		$_enc->key 		= self::GenerateKey();
+		$_enc->iv 		= self::GenerateIV($base64);
+		$_enc->encrypt 	= openssl_encrypt
+		( 
+			self::Pkcs7Pad($text, 16), 	// pad data 
+			'AES-256-CBC', 				// cipher and mode 
+			$_enc->key,					// secret key 
+			0, 							// options (not used) 
+			$_enc->iv 					// initialisation vector 
 		);
+        
+        return $_enc;
 	}
-	
+
 	/**
      * Decrypts a given string 
      *
-     * @param string $input
+     * @param string $text
      * => The input that needs to be decrypted.
-     * @param string $encryption_key
+     * @param string $key
      * => The key that was used to encrypt the string.
+     * @param string $iv
+     * => The initialization vector that was used to encrypt the string.
      *
      * @return string $output
      */
-	public function decrypt($input, $encryption_key) {
-		$enc_name = $input['Name'];
-
-		$iv = $input['IV'];
-
-		$name = pkcs7_unpad(openssl_decrypt(
-		    $enc_name,
-		    'AES-256-CBC',
-		    $encryption_key,
-		    0,
-		    $iv
-		));
-	}
-
-	protected function pkcs7_pad($data, $size)
+	public static function deCrypt($text, $key, $iv, $base64 = false)
 	{
-	    $length = $size - strlen($data) % $size;
-	    return $data . str_repeat(chr($length), $length);
+		/* 
+		 * user base64_decode or hex2bin depending on column type BINARYVAR/BINDARY/VARCHAR
+		 */
+
+		if($key)
+        {
+            return self::Pkcs7Unpad( openssl_decrypt
+			(
+				$base64 ? base64_decode($text) : $text,
+				'AES-256-CBC',
+				$key,
+				0,
+				$base64 ? base64_decode($iv) : $iv
+			));
+
+            return null;
+        }
 	}
 
-	protected function pkcs7_unpad($data)
+	/**
+	 * Generates a key for encryption. Returns a binary blob generated from a reliable pseudo random number generator (OpenSSL)
+	 *
+	 * @return string $output
+	 */
+	private static function GenerateKey()
 	{
-	    return substr($data, 0, -ord($data[strlen($data) - 1]));
+		$key_size = 32; // 256 bits
+		return openssl_random_pseudo_bytes($key_size, $strong);
 	}
+
+	/*
+	 * Returns an Initialization Vector (extra randomness for the encryption)
+	 * The i.v. should be regenerated and restored after modifying a model
+	 */
+	private static function GenerateIV($base64 = false)
+	{
+		$iv_size = 16; // 128 bits
+		$iv = openssl_random_pseudo_bytes($iv_size, $strong) ;
+		
+		/* 
+		 * return a (non) base64 encoded iv.
+		 * set $base64 to true when de iv database column is BINARY or VARBINARY
+		 */
+		return $base64 ? base64_encode($iv) : $iv;
+	}
+
+	/* 
+	 * Pad data to blocksize
+	 * More info: 
+	 * http://www.di-mgt.com.au/cryptopad.html#whatispadding
+	 * https://www.w3schools.com/php/func_string_str_pad.asp
+	 */
+	private static function Pkcs7Pad($data, $size) 
+	{ 
+		$length = $size - strlen($data) % $size; 
+		return $data . str_repeat(chr($length), $length); 
+	}
+
+	private static function Pkcs7Unpad($data)
+	{
+		return substr($data, 0, -ord($data[strlen($data) - 1]));
+	}
+	
 
 	/**
      * Hashes a given string 
@@ -155,15 +202,5 @@ class Security
 		$salt = substr(str_replace('+','.',base64_encode(md5(mt_rand(), true))),0,16);
 		
 		return $salt;
-	}
-
-	/**
-     * Generates a key for encryption
-     *
-     * @return string $output
-     */
-	public function generateKey() {
-		$key_size = 32; // 256 bits
-		return openssl_random_pseudo_bytes($key_size, $strong);
 	}
 }
