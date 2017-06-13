@@ -123,7 +123,7 @@ class Security
 	 *
 	 * @return string $output
 	 */
-	private static function GenerateKey()
+	public static function GenerateKey()
 	{
 		$key_size = 32; // 256 bits
 		return openssl_random_pseudo_bytes($key_size, $strong);
